@@ -1,3 +1,30 @@
+/*
+ * ====================================================================
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ */
+
 package edu.se.ustc;
 
 import java.io.IOException;
@@ -15,131 +42,20 @@ import org.apache.http.util.EntityUtils;
 
 import edu.se.ustc.item.BusStationInfo;
 
+/**
+ * This example demonstrates the use of the {@link ResponseHandler} to simplify
+ * the process of processing the HTTP response and releasing associated
+ * resources.
+ */
 public class ClientWithResponseHandler {
-	
-	
-	/**
-	 * get each station information with the format of String
-	 * @param str
-	 * @return
-	 */
-
-	List<String> getEachStationInfo(String str) {
-
-		List<String> stringList = new ArrayList<String>();
-
-		while (str != null && str.indexOf("<tr>") >= 0
-				&& str.indexOf("</tr>") >= 0) {
-
-			// System.out.println(str.indexOf("<tr>"));
-
-			String content = str.substring(str.indexOf("<tr>"),
-					str.indexOf("</tr>") + 5);
-
-			// System.out.println(content);
-
-			stringList.add(content);
-
-			str = str.substring(str.indexOf("</tr>") + 5);
-
-		}
-
-		return stringList;
-	}
-
-	/**
-	 * get BusStationInfo from String information
-	 * @param bsiString
-	 * @return
-	 */
-	BusStationInfo stringToBusStationInfo(String bsiString) {
-
-		if (bsiString.indexOf("<td>") < 0 || bsiString.indexOf("</td>") < 0) {
-			return null;
-		}
-
-		BusStationInfo bsi = new BusStationInfo();
-
-		String str = bsiString;
-
-		String content = str.substring(str.indexOf("<td>"),
-				str.indexOf("</td>"));
-
-		if (content.indexOf("StandName") >= 0) {
-			bsi.setStationName(content.substring(
-					content.indexOf("StandName") + 10, content.indexOf("\">")));
-		}
-
-		str = str.substring(str.indexOf("</td>") + 5);
-		content = str.substring(str.indexOf("<td>") + 4, str.indexOf("</td>"));
-
-		if (content != "") {
-
-			bsi.setStationSeries(content);
-		}
-
-		str = str.substring(str.indexOf("</td>") + 5);
-		content = str.substring(str.indexOf("<td>") + 4, str.indexOf("</td>"));
-
-		if (content != "") {
-
-			bsi.setBusLicence(content);
-		}
-
-		str = str.substring(str.indexOf("</td>") + 5);
-
-		content = str.substring(str.indexOf("<td>") + 4, str.indexOf("</td>"));
-
-		if (content != "") {
-
-			bsi.setEnterStationTime(content);
-		}
-
-		return bsi;
-	}
-
-	/**
-	 * get BusStationInfo List from String List
-	 * @param stringList
-	 * @return
-	 */
-	List<BusStationInfo> getBusStationInfoList(List<String> stringList) {
-		List<BusStationInfo> bsiList = new ArrayList<BusStationInfo>();
-		int size = 0;
-
-		while (size < stringList.size()) {
-
-			String bsiString = stringList.get(size);
-
-			if (stringToBusStationInfo(bsiString) != null)
-				bsiList.add(stringToBusStationInfo(bsiString));
-
-			size++;
-		}
-		return bsiList;
-
-	}
-	
-	/**
-	 * output BusStation List
-	 * @param bsiList
-	 */
-
-	void printBusStationInfo(List<BusStationInfo> bsiList) {
-		for (int i = 0; i < bsiList.size(); i++) {
-			System.out.println(bsiList.get(i));
-		}
-	}
-
-	/**
-	 * the main handler function of Crawls
-	 * @throws Exception
-	 */
+    /**
+     * the main handler function of Crawls
+     * @throws Exception
+     */
 	public void run(String address) throws Exception {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpGet httpget = new HttpGet(address);
-
 			System.out.println("Executing request " + httpget.getRequestLine());
 
 			// Create a custom response handler
@@ -168,21 +84,22 @@ public class ClientWithResponseHandler {
 					responseBody.lastIndexOf("table"));
 
 			System.out.println(str);
+//<moded-by-Pei 2015/04/20  get the string and  split it
+			BusStationInfo binfo=new BusStationInfo();
+			List<String> stringList =binfo.getEachStationInfo(str);
 
-			List<String> stringList = getEachStationInfo(str);
+			List<BusStationInfo> bsiList = binfo.getBusStationInfoList(stringList);
 
-			List<BusStationInfo> bsiList = getBusStationInfoList(stringList);
-
-			printBusStationInfo(bsiList);
-
+			binfo.printBusStationInfo(bsiList);
+//>
 		} finally {
 			httpclient.close();
 		}
 	}
 
-	public static void main(String[] agrs) {
-
-		ClientWithResponseHandler cwrh = new ClientWithResponseHandler();
+	public static void main(String[] agrs){
+		
+		ClientWithResponseHandler cwrh  = new ClientWithResponseHandler();
 		String address = "http://www.szjt.gov.cn/BusQuery/APTSLine.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4&LineGuid=9acf55b9-8406-40ef-8056-6de249174ee0&LineInfo=19(%E6%96%B0%E7%81%AB%E8%BD%A6%E7%AB%99%E5%8C%97%E4%B8%B4%E6%97%B6%E5%B9%BF%E5%9C%BA)";
 		try {
 			cwrh.run(address);
@@ -190,7 +107,7 @@ public class ClientWithResponseHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 	}
 
 }
