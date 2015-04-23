@@ -3,7 +3,7 @@ package edu.se.ustc.item;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BusStationInfo {
+public class BusRouteInfo {
 
     Integer id;
     String stationName;// the name of bus station
@@ -56,7 +56,7 @@ public class BusStationInfo {
 
 	@Override
 	public String toString() {
-		return "BusStationInfo [stationName=" + stationName
+		return "BusRouteInfo [stationName=" + stationName
 				+ ", stationSeries=" + stationSeries + ", busLicence="
 				+ busLicence + ", enterStationTime=" + enterStationTime + "]";
 	}
@@ -83,15 +83,15 @@ public class BusStationInfo {
     }
 	
     /**
-     * get BusStationInfo from String information
+     * get BusRouteInfo from String information
      * @param bsiString
      * @return
      */
-   public  BusStationInfo stringToBusStationInfo(String bsiString) {
+   public  BusRouteInfo stringToBusRouteInfo(String bsiString) {
         if (bsiString.indexOf("<td>") < 0 || bsiString.indexOf("</td>") < 0) {
             return null;
         }
-        BusStationInfo bsi = new BusStationInfo();
+        BusRouteInfo bsi = new BusRouteInfo();
         String str = bsiString;
         String content = str.substring(str.indexOf("<td>"),
                 str.indexOf("</td>"));
@@ -123,18 +123,18 @@ public class BusStationInfo {
     }
    
    /**
-    * get BusStationInfo List from String List
+    * get BusRouteInfo List from String List
     * @param stringList
     * @return
     */
-    public List<BusStationInfo> getBusStationInfoList(List<String> stringList) {
-        List<BusStationInfo> bsiList = new ArrayList<BusStationInfo>();
+    public List<BusRouteInfo> getBusRouteInfoList(List<String> stringList) {
+        List<BusRouteInfo> bsiList = new ArrayList<BusRouteInfo>();
         int size = 0;
 
         while (size < stringList.size()) {
             String bsiString = stringList.get(size);
-            if (stringToBusStationInfo(bsiString) != null)
-                bsiList.add(stringToBusStationInfo(bsiString));
+            if (stringToBusRouteInfo(bsiString) != null)
+                bsiList.add(stringToBusRouteInfo(bsiString));
             size++;
         }
         return bsiList;
@@ -145,7 +145,7 @@ public class BusStationInfo {
      * output BusStation List
      * @param bsiList
      */
-   public  void printBusStationInfo(List<BusStationInfo> bsiList) {
+   public  void printBusRouteInfo(List<BusRouteInfo> bsiList) {
         for (int i = 0; i < bsiList.size(); i++) {
             System.out.println(bsiList.get(i));
         }

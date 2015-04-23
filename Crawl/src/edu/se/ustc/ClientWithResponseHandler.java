@@ -40,7 +40,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import edu.se.ustc.item.BusStationInfo;
+import edu.se.ustc.item.BusRouteInfo;
 
 /**
  * This example demonstrates the use of the {@link ResponseHandler} to simplify
@@ -85,12 +85,12 @@ public class ClientWithResponseHandler {
 
 			System.out.println(str);
 //<moded-by-Pei 2015/04/20  get the string and  split it
-			BusStationInfo binfo=new BusStationInfo();
+			BusRouteInfo binfo=new BusRouteInfo();
 			List<String> stringList =binfo.getEachStationInfo(str);
 
-			List<BusStationInfo> bsiList = binfo.getBusStationInfoList(stringList);
+			List<BusRouteInfo> bsrList = binfo.getBusRouteInfoList(stringList);
 
-			binfo.printBusStationInfo(bsiList);
+			binfo.printBusRouteInfo(bsrList);
 //>
 		} finally {
 			httpclient.close();
