@@ -1,6 +1,8 @@
 package edu.se.ustc.item;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BusRouteInfo {
@@ -55,6 +57,7 @@ public class BusRouteInfo {
 	}
 
 	@Override
+	//the string which will be printed each line
 	public String toString() {
 		return "BusRouteInfo [stationName=" + stationName
 				+ ", stationSeries=" + stationSeries + ", busLicence="
@@ -67,7 +70,7 @@ public class BusRouteInfo {
      * @param str
      * @return
      */
-	public List<String> getEachStationInfo(String str) {
+	private List<String> getEachStationInfo(String str) {
         List<String> stringList = new ArrayList<String>();
 
         while (str != null && str.indexOf("<tr>") >= 0
@@ -127,8 +130,10 @@ public class BusRouteInfo {
     * @param stringList
     * @return
     */
-    public List<BusRouteInfo> getBusRouteInfoList(List<String> stringList) {
+    public List<BusRouteInfo> getBusRouteInfoList(String str) {
+        List<String> stringList =getEachStationInfo(str);
         List<BusRouteInfo> bsiList = new ArrayList<BusRouteInfo>();
+        
         int size = 0;
 
         while (size < stringList.size()) {
@@ -136,10 +141,9 @@ public class BusRouteInfo {
             if (stringToBusRouteInfo(bsiString) != null)
                 bsiList.add(stringToBusRouteInfo(bsiString));
             size++;
-        }
+        } 
         return bsiList;
     }
-
     
     /**
      * output BusStation List
@@ -149,6 +153,35 @@ public class BusRouteInfo {
         for (int i = 0; i < bsiList.size(); i++) {
             System.out.println(bsiList.get(i));
         }
-   }	
+   }
+        
+   //the string which will be printed into text
+   public String toTxt() {
+       //get current time
+       Date d = new Date();
+       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd "); 
+       String dateNowStr = sdf.format(d);
+       
+       return  stationSeries + ","
+               + busLicence + "," + dateNowStr + enterStationTime;
+   }
+        /**
+         * try to save not empty BusStation List
+         * @param bsiList
+         */
+   public boolean saveToTxt(List<BusRouteInfo> oldList,List<BusRouteInfo> bsiList){
+       List<String> list= new ArrayList<String>();
+       //只刷新当前为空
+       for (int i = 0; i < bsiList.size(); i++) {
+           if(!oldList.get(i).equals(bsiList.get(i))){
+               oldList.set(i,bsiList.get(i));
+               System.out.println(oldList.get(i));
+           }
+       }
+       return true;
+   }
+        
+   
+   
 }
 //>

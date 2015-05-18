@@ -2,15 +2,17 @@ package edu.se.ustc.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 
 public class dbUtil {
 
 	public static Connection getConnect() {
-
-		String url = "jdbc:mysql://localhost:3306/BusInfo?"
-				+ "user=root&password=brighter&useUnicode=true&characterEncoding=UTF8";
+//database URL
+		String url = "jdbc:mysql://localhost:3306/bus_info?"
+				+ "user=root&password=123&useUnicode=true&characterEncoding=UTF-8";
 		Connection conn = null;
 
 		/* load the driver of mySql */
@@ -46,4 +48,6 @@ public class dbUtil {
 
 		return dbUtil.executeSql(sql,conn);
 	}
+	
+
 }
