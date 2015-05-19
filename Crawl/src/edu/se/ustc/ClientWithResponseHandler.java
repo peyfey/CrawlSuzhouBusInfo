@@ -58,16 +58,19 @@ public class ClientWithResponseHandler implements Runnable {
     private String URL;             //进程URL
     private static boolean startFlag; //所有进程启动标志
     
+    
     public ClientWithResponseHandler(String fileName, String URL){
         this.fileName=fileName;
         this.URL=URL;
     }
     
-	public void run(String address) throws Exception {
+	public List<BusRouteInfo> run(String URL) throws Exception {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
+		List<BusRouteInfo> bsrList = new ArrayList<BusRouteInfo>();
 		try {
-			HttpGet httpget = new HttpGet(address);
-			System.out.println("Executing request " + httpget.getRequestLine());
+			HttpGet httpget = new HttpGet(URL);
+			//debug
+			//System.out.println("Executing request " + httpget.getRequestLine());
 
 			// Create a custom response handler
 			ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
@@ -87,20 +90,20 @@ public class ClientWithResponseHandler implements Runnable {
 
 			};
 			String responseBody = httpclient.execute(httpget, responseHandler);
-			System.out.println("----------------------------------------");
+			//System.out.println("----------------------------------------");
 
-			// System.out.println(responseBody);
+			 //System.out.println(responseBody);
 
 			String str = responseBody.substring(responseBody.indexOf("table"),
 					responseBody.lastIndexOf("table"));
-
-			System.out.println(str);
+			//debug
+			//System.out.println(str);
 
 			BusRouteInfo binfo=new BusRouteInfo();
-			List<BusRouteInfo> bsrList = binfo.getBusRouteInfoList(str);
-			List<BusRouteInfo> oldList = bsrList;
+			bsrList = binfo.getBusRouteInfoList(str);
 			
-			binfo.printBusRouteInfo(bsrList);
+			//debug, print all infomation
+			//binfo.printBusRouteInfo(bsrList);
 			
 			
 			//select the db
@@ -111,6 +114,8 @@ public class ClientWithResponseHandler implements Runnable {
 		} finally {
 			httpclient.close();
 		}
+		
+		return bsrList;
 	}
 
 //	public static void main(String[] agrs){
@@ -141,20 +146,43 @@ public class ClientWithResponseHandler implements Runnable {
     @Override
     public void run() {
         // TODO Auto-generated method stub
-        //
-        //String address = "http://www.szjt.gov.cn/BusQuery/APTSLine.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4&LineGuid=9acf55b9-8406-40ef-8056-6de249174ee0&LineInfo=19(%E6%96%B0%E7%81%AB%E8%BD%A6%E7%AB%99%E5%8C%97%E4%B8%B4%E6%97%B6%E5%B9%BF%E5%9C%BA)";
-        //快线2号
-        //String address ="http://www.szjt.gov.cn/BusQuery/APTSLine.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4&LineGuid=e0e5561a-32ea-432d-ac98-38eed8c4e448&LineInfo=%E5%BF%AB%E7%BA%BF2%E5%8F%B7(%E7%8B%AC%E5%A2%85%E6%B9%96%E9%AB%98%E6%95%99%E5%8C%BA%E9%A6%96%E6%9C%AB%E7%AB%99=%3E%E7%81%AB%E8%BD%A6%E7%AB%99)";
-        //ClientWithResponseHandler cwrh  = new ClientWithResponseHandler("K2",address);
+     
+        if(getStartFlag()){
+            System.out.println(fileName + " thread is start.");
+        }
+        else{
+            System.out.println(fileName + " thread is closed.");
+        }
+        ClientWithResponseHandler cwrh  = new ClientWithResponseHandler(fileName, URL);
+        //旧的list用于保存更新之前的信息, 方便对比
+        List<BusRouteInfo> oldList =new ArrayList<BusRouteInfo>();
+        List<BusRouteInfo> bsiList =new ArrayList<BusRouteInfo>();
+            try {
+                oldList = cwrh.run(URL);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         while(getStartFlag()){
             try {
-                run(URL);
+                bsiList=cwrh.run(URL);
                 Thread.currentThread().sleep(5000);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            BusRouteInfo bri=new BusRouteInfo();
+            if(oldList!=null&&bsiList!=null)
+            {
+                try {
+                    if(bri.saveToTxt(fileName,oldList, bsiList)){
+                        oldList = bsiList;
+                    }
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
     }
-
 }

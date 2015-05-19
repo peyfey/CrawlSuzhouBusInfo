@@ -4,6 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class BusRouteInfo {
 
@@ -64,7 +67,6 @@ public class BusRouteInfo {
 				+ busLicence + ", enterStationTime=" + enterStationTime + "]";
 	}
 	
-//<moded-by-Pei 2015/04/20  the operation of businfo
     /**
      * get each station information with the format of String
      * @param str
@@ -162,23 +164,55 @@ public class BusRouteInfo {
        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd "); 
        String dateNowStr = sdf.format(d);
        
-       return  stationSeries + ","
+       return   stationSeries + ","
                + busLicence + "," + dateNowStr + enterStationTime;
    }
+   
         /**
          * try to save not empty BusStation List
          * @param bsiList
+         * @throws IOException 
          */
-   public boolean saveToTxt(List<BusRouteInfo> oldList,List<BusRouteInfo> bsiList){
-       List<String> list= new ArrayList<String>();
-       //只刷新当前为空
-       for (int i = 0; i < bsiList.size(); i++) {
-           if(!oldList.get(i).equals(bsiList.get(i))){
-               oldList.set(i,bsiList.get(i));
-               System.out.println(oldList.get(i));
+   public boolean saveToTxt(String fileName, List<BusRouteInfo> oldList,List<BusRouteInfo> bsiList) throws IOException{
+       
+       File file = new File(fileName + ".txt");
+       FileWriter fw = new FileWriter(file, true);
+       
+       if(!file.exists()){
+           //创建文件
+           try{
+                    boolean b = file.createNewFile();
+           }catch(Exception e){
+                    e.printStackTrace();
            }
        }
-       return true;
+       //只刷新当前为空
+       for (int i = 0; i < bsiList.size()-1; i++) {
+           //当前进站list发生更新,且更新内容不为空
+           if(!oldList.get(i).enterStationTime.equals(bsiList.get(i).enterStationTime)){
+               //非第一行更新
+               if(bsiList.get(i).enterStationTime!=null&&bsiList.get(i+1).enterStationTime!=null){
+                   System.out.println(fileName +" "+  bsiList.get(i+1).toTxt());
+                   fw.append(bsiList.get(i+1).toTxt()+"\r\n");
+                   fw.flush();
+                   fw.close();
+                   return true;
+                   
+               }
+               //第一行更新
+               else if(bsiList.get(i).enterStationTime==null&&bsiList.get(i).enterStationTime!=null){
+                   System.out.println(fileName +" "+  bsiList.get(i).toTxt());
+                   fw.append(bsiList.get(i).toTxt()+"\r\n");
+                   fw.flush();
+                   fw.close();
+                   return true;
+                  
+               }
+           }
+       } 
+       fw.flush();
+       fw.close();
+       return false;
    }
         
    
