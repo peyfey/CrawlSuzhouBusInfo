@@ -187,31 +187,37 @@ public class BusRouteInfo {
            }
        }
        //只刷新当前为空
-       for (int i = 0; i < bsiList.size()-1; i++) {
-           //当前进站list发生更新,且更新内容不为空
+       for (int i = 0; i < bsiList.size(); i++) {
+//           //当前进站list发生更新,且更新内容不为空
            if(!oldList.get(i).enterStationTime.equals(bsiList.get(i).enterStationTime)){
-               //非第一行更新
-               if(bsiList.get(i).enterStationTime!=null&&bsiList.get(i+1).enterStationTime!=null){
-                   System.out.println(fileName +" "+  bsiList.get(i+1).toTxt());
-                   fw.append(bsiList.get(i+1).toTxt()+"\r\n");
-                   fw.flush();
-                   fw.close();
-                   return true;
-                   
-               }
-               //第一行更新
-               else if(bsiList.get(i).enterStationTime==null&&bsiList.get(i).enterStationTime!=null){
+//               //非第一行更新
+//               if(bsiList.get(i).enterStationTime!=null&&bsiList.get(i+1).enterStationTime!=null){
+//                   System.out.println(fileName +" "+  bsiList.get(i+1).toTxt());
+//                   fw.append(bsiList.get(i+1).toTxt()+"\r\n");
+//                   fw.flush();
+//                   fw.close();
+//                   return true;
+//                   
+//               }
+//               //第一行更新
+//               else if(bsiList.get(i).enterStationTime==null&&bsiList.get(i).enterStationTime!=null){
+//                   System.out.println(fileName +" "+  bsiList.get(i).toTxt());
+//                   fw.append(bsiList.get(i).toTxt()+"\r\n");
+//                   fw.flush();
+//                   fw.close();
+//                   return true;
+//               }
+               if(!bsiList.get(i).enterStationTime.equals("")){
                    System.out.println(fileName +" "+  bsiList.get(i).toTxt());
                    fw.append(bsiList.get(i).toTxt()+"\r\n");
                    fw.flush();
                    fw.close();
                    return true;
-                  
-               }
+                }              
            }
        } 
-       fw.flush();
-       fw.close();
+      // fw.flush();
+      // fw.close();
        return false;
    }
         
